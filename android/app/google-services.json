@@ -1,0 +1,73 @@
+{
+    "project_info": {
+      "project_number": "441985178091",
+      "firebase_url": "https://newchat-dc8c0.firebaseio.com",
+      "project_id": "newchat-dc8c0",
+      "storage_bucket": "newchat-dc8c0.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:441985178091:android:91e6c2665fa1eb87",
+          "android_client_info": {
+            "package_name": "com.chatappsplash"
+          }
+        },
+        "oauth_client": [
+          {
+            "client_id": "441985178091-4rp6mn4si6u803p54jhrgale554m7m2s.apps.googleusercontent.com",
+            "client_type": 3
+          }
+        ],
+        "api_key": [
+          {
+            "current_key": "AIzaSyDZdZIXFWcQcEtGFgIOBpsfckOp02xJoj4"
+          }
+        ],
+        "services": {
+          "analytics_service": {
+            "status": 1
+          },
+          "appinvite_service": {
+            "status": 1,
+            "other_platform_oauth_client": []
+          },
+          "ads_service": {
+            "status": 2
+          }
+        }
+      },
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:441985178091:android:3ba27b39d667639a",
+          "android_client_info": {
+            "package_name": "com.fire"
+          }
+        },
+        "oauth_client": [
+          {
+            "client_id": "441985178091-4rp6mn4si6u803p54jhrgale554m7m2s.apps.googleusercontent.com",
+            "client_type": 3
+          }
+        ],
+        "api_key": [
+          {
+            "current_key": "AIzaSyDZdZIXFWcQcEtGFgIOBpsfckOp02xJoj4"
+          }
+        ],
+        "services": {
+          "analytics_service": {
+            "status": 1
+          },
+          "appinvite_service": {
+            "status": 1,
+            "other_platform_oauth_client": []
+          },
+          "ads_service": {
+            "status": 2
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }

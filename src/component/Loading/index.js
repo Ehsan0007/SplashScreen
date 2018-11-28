@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
-import firebase from './../../../config/index'
+import firebase from "react-native-firebase";
 
 class Loading extends Component {
     constructor(props) {
