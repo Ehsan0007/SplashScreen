@@ -1,20 +1,154 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity, ListView, StyleSheet, Image } from 'react-native';
+import Ionicons from 'react-native-vector-icons/FontAwesome5';
+import firebase from "react-native-firebase";
+
+var name, uid, email;
 
 class SettingsScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            name: "",
+            uid: null,
+            email: "",
+            dataSource: new ListView.DataSource({
+                rowHasChanged: (row1, row2) => row1 !== row2
+            }),
+            loading: true
         };
+        this.friendsRef = this.getRef().child("friends");
+    }
+    listenForItems(friendsRef) {
+        var user = firebase.auth().currentUser;
+
+        friendsRef.on("value", snap => {
+            // get children as an array
+            var items = [];
+            snap.forEach(child => {
+                if (child.val().email != user.email)
+                    items.push({
+                        name: child.val().name,
+                        uid: child.val().uid,
+                        email: child.val().email
+                    });
+            });
+
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(items),
+                loading: false
+            });
+        });
+    }
+    getRef() {
+        return firebase.database().ref();
+    }
+    componentDidMount() {
+        this.listenForItems(this.friendsRef);
+    }
+    renderRow = rowData => {
+        return (
+            <TouchableOpacity
+                onPress={() => {
+                    name = rowData.name;
+                    email = rowData.email;
+                    uid = rowData.uid;
+                    this.props.navigation.navigate("Chat", {
+                        name: name,
+                        email: email,
+                        uid: uid
+                    });
+                }}
+            >
+                <View style={styles.profileContainer}>
+                    <Image
+                        source={{
+                            uri: "https://www.gravatar.com/avatar/"
+                        }}
+                        style={styles.profileImage}
+                    />
+                    <Text style={styles.profileName}>{rowData.name}</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+    handleSignout() {
+        firebase.auth().signOut()
+            .then(() => { this.props.navigation.navigate("Login") }, )
     }
 
     render() {
         return (
-            <View>
-                <Text> SettingsScreen screen </Text>
+            <View style={{ flex: 1, }}>
+                <View style={{ flex: 0.5, width: '100%', backgroundColor: '#3173FA', justifyContent: 'center', }}>
+                    <View style={{ width: '90%', alignSelf: "center", justifyContent: "space-between", flexDirection: 'row' }}>
+                        <TouchableOpacity onPress={() => this.props.navigation.goBack(null)}>
+                            <Ionicons name="arrow-left" size={16} color="#fff" />
+                        </TouchableOpacity>
+                        <Text style={{ color: "#fff" }}>Friend List</Text>
+                        <TouchableOpacity onPress={() => this.handleSignout()}>
+                            <Text style={{ color: "#fff" }}>Logout</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.container}>
+                    <View style={styles.topGroup}>
+                        <Text style={styles.myFriends}>My Friends</Text>
+                    </View>
+                    <ListView
+                        dataSource={this.state.dataSource}
+                        renderRow={this.renderRow}
+                    />
+                    {/* <Spinner visible={this.state.loading} /> */}
+                </View>
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 3.5,
+        alignItems: "stretch",
+        marginRight: 10,
+        marginLeft: 10
+    },
+    rightButton: {
+        marginTop: 10,
+        marginLeft: 5,
+        marginRight: 10,
+        padding: 0
+    },
+    topGroup: {
+        flexDirection: "row",
+        margin: 10
+    },
+    myFriends: {
+        flex: 1,
+        color: "#3A5BB1",
+        //tintColor: "#fff",
+        //secondaryColor: '#E9E9E9',
+        //grayColor: '#A5A5A5',
+        fontSize: 16,
+        padding: 5
+    },
+    profileContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 8,
+        marginLeft: 6,
+        marginBottom: 8
+    },
+    profileImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        marginLeft: 6
+    },
+    profileName: {
+        marginLeft: 6,
+        fontSize: 16
+    }
+});
 
 export default SettingsScreen;

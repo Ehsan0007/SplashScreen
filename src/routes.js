@@ -6,7 +6,7 @@ import {
     StackViewTransitionConfigs,
     createSwitchNavigator
 } from 'react-navigation'
-import { Loading, Main, Login, SignUp, HomeScreen, SettingsScreen } from './component/index'
+import { Loading, Main, Login, SignUp, HomeScreen, SettingsScreen, ChatScreen } from './component/index'
 import { Platform } from 'react-native'
 import { Icon } from "react-native-elements";
 import React from 'react'
@@ -87,7 +87,15 @@ SettingsStack.navigationOptions = {
 };
 
 const AppStack = Platform.select({
-    android: createBottomTabNavigator({ HomeStack, SettingsStack }),
+    android: createBottomTabNavigator({
+        HomeStack,
+        SettingsStack
+    },
+        {
+            tabBarOptions: { showLabel: true },
+            initialRouteName: "SettingsStack",
+        }
+    ),
 });
 
 const LoginStack = createStackNavigator(
@@ -110,7 +118,8 @@ const LoginStack = createStackNavigator(
 const RootSwitch = createSwitchNavigator(
     {
         LoginStack: LoginStack,
-        Main: AppStack
+        Main: AppStack,
+        Chat: ChatScreen
     },
     {
         initialRouteName: "LoginStack",
@@ -172,3 +181,4 @@ export default RootSwitch;
 // );
 
 // export default Routes
+
