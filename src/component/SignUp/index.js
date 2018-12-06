@@ -44,19 +44,24 @@ export default class SignUp extends React.Component {
                 .createUserWithEmailAndPassword(email, password)
                 .then((user) => {
                     if (user) {
-                        // cons ole.warn("succccess")
-                        this.setState({ loading: false })
+                        let uuid = user.user._user.uid
                         this.getRef()
-                        .child("friends")
-                        .push({
-                            email: email,
-                            uid: user.uid,
-                            name: this.state.name,
-                            image: this.state.imageUrl,
-                            token: Token
-                        });
-                    this.props.navigation.navigate('Main')
-                    }
+                            .child("friends")
+                            .push({
+                                email: email,
+                                uid: uuid,
+                                name: this.state.name,
+                                image: this.state.imageUrl,
+                                token: Token
+                            });
+                        this.props.navigation.navigate('Main')
+                        this.setState({ loading: false })
+                     
+                    }   // firebase.auth().onAuthStateChanged((data) => {
+                        //     if (data) {
+
+                        //     }
+                        // })
 
                 })
                 .catch(error => {
@@ -64,12 +69,13 @@ export default class SignUp extends React.Component {
                     var errorMessage = error.message;
                     this.setState({ errorMessage, loading: false });
                 });
+
         } else {
             this.setState({ errorMessage: "please add empty field" })
         }
         // firebase.auth().onAuthStateChanged(user => {
         //     if (user) {
-               
+
         //     }
         // });
     }

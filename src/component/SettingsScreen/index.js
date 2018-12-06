@@ -34,7 +34,7 @@ class SettingsScreen extends Component {
                         name: child.val().name,
                         uid: child.val().uid,
                         email: child.val().email,
-                        image: child.val().image
+                        image : child.val().image
                     });
             });
 
@@ -60,7 +60,7 @@ class SettingsScreen extends Component {
                     this.props.navigation.navigate("Chat", {
                         name: name,
                         email: email,
-                        uid: uid
+                        uid: uid,
                     });
                 }}
             >
