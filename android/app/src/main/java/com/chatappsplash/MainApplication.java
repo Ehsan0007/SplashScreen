@@ -3,10 +3,14 @@ package com.chatappsplash;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.imagepicker.ImagePickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage; 
 import io.invertase.firebase.database.RNFirebaseDatabasePackage; 
 import com.facebook.react.ReactNativeHost;
@@ -29,12 +33,16 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new PickerPackage(),
+            new RNFetchBlobPackage(),
+            new ImagePickerPackage(),
             new VectorIconsPackage(),
             new RNFirebasePackage(),
             new SplashScreenReactPackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseAuthPackage(),
-            new RNFirebaseDatabasePackage()
+            new RNFirebaseDatabasePackage(),
+            new RNFirebaseStoragePackage()
       );
     }
 

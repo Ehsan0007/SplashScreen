@@ -1,7 +1,9 @@
 // SignUp.js
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, Button, ActivityIndicator, AsyncStorage } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Button, ActivityIndicator, AsyncStorage, KeyboardAvoidingView, Image, PixelRatio, TouchableOpacity } from 'react-native'
 import firebase from "react-native-firebase";
+import ImagePicker from 'react-native-image-crop-picker'
+import RNFetchBlob from 'react-native-fetch-blob'
 
 var Token;
 
@@ -13,8 +15,13 @@ export default class SignUp extends React.Component {
             password: '',
             errorMessage: null,
             name: '',
-            loading: false
+            loading: false,
+            avatarSource: null,
+            imageUrl: "",
+            imageloading: true,
+            imagePathSource: ""
         }
+        this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
         firebase
             .messaging()
             .getToken()
@@ -27,44 +34,100 @@ export default class SignUp extends React.Component {
     getRef() {
         return firebase.database().ref();
     }
-    async handleSignUp() {
-        const { email, password, name } = this.state;
-        this.setState({ errorMessage: null, loading: true });
-        firebase
-            .auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                this.setState({ loading: false });
-            })
-            .catch(error => {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                this.setState({ errorMessage, loading: false });
-            });
+    handleSignUp = () => {
+        this.setState({ loading: true });
+        const { email, password, name, imageloading } = this.state;
+        // this.setState({ imageloading: true });
+        if (!email == "" && !password == "") {
+            firebase
+                .auth()
+                .createUserWithEmailAndPassword(email, password)
+                .then((user) => {
+                    if (user) {
+                        // cons ole.warn("succccess")
+                        this.setState({ loading: false })
+                        this.getRef()
+                        .child("friends")
+                        .push({
+                            email: email,
+                            uid: user.uid,
+                            name: this.state.name,
+                            image: this.state.imageUrl,
+                            token: Token
+                        });
+                    this.props.navigation.navigate('Main')
+                    }
 
-        await AsyncStorage.setItem("email", email);
-        await AsyncStorage.setItem("name", name);
-        await AsyncStorage.setItem("password", password);
-
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                console.warn(user.uid, user.email);
-                this.getRef()
-                    .child("friends")
-                    .push({
-                        email: email,
-                        uid: user.uid,
-                        name: this.state.name,
-                        token: Token
-                    });
-                this.props.navigation.navigate('Main')
-                this.setState({
-                    loading: false
+                })
+                .catch(error => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    this.setState({ errorMessage, loading: false });
                 });
-            }
-        });
+        } else {
+            this.setState({ errorMessage: "please add empty field" })
+        }
+        // firebase.auth().onAuthStateChanged(user => {
+        //     if (user) {
+               
+        //     }
+        // });
     }
+
+    selectPhotoTapped() {
+        ImagePicker.openPicker({
+            width: 300,
+            height: 300,
+            includeBase64: true,
+            includeExif: true,
+        }).then(image => {
+            this.setState({
+                avatarSource: { uri: `data:${image.mime};base64,` + image.data, width: image.width, height: image.height },
+
+            });
+            const imagePath = image.path
+            this.setState({ imagePathSource: imagePath })
+            let uploadBlob = null
+            const Blob = RNFetchBlob.polyfill.Blob
+            const fs = RNFetchBlob.fs
+            window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+            window.Blob = Blob
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for (var i = 0; i < 10; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            // let uniqueId = user.user._user.uid
+            const imageRef = firebase.storage().ref('images').child(`${text}_dp.jpg`)
+            let mime = 'image/jpg'
+            fs.readFile(imagePath, 'base64')
+                .then((data) => {
+                    //console.log(data);
+                    return Blob.build(data, { type: `${mime};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.put(imagePath, { contentType: mime })
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    console.log("imagelink", url)
+                    this.setState({ imageUrl: url, imageloading: false })
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
+
     render() {
+        // console.log("state", this.state.imageUrl)
         return (
             <View style={styles.container}>
                 <Text>Sign Up</Text>
@@ -94,8 +157,41 @@ export default class SignUp extends React.Component {
                     onChangeText={password => this.setState({ password })}
                     value={this.state.password}
                 />
+                <View style={{ marginTop: 10 }}>
+                    <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)}>
+                        <View
+                            style={[
+                                styles.avatar,
+                                styles.avatarContainer,
+                                { marginBottom: 20 },
+                            ]}
+                        >
+                            {this.state.avatarSource === null ? (
+                                <Text>Select a Photo</Text>
+                            ) : (
+                                    <Image style={styles.avatar} source={this.state.avatarSource} />
+                                )}
+                        </View>
+                    </TouchableOpacity>
+                </View>
                 <View style={{ marginBottom: 10 }}></View>
-                {this.props.loading ? <ActivityIndicator color="blue" /> : <Button title="Sign Up" onPress={this.handleSignUp.bind(this)} />}
+                {this.state.imageloading ?
+                    // <ActivityIndicator color="#3173FA" /> 
+
+                    // <TouchableOpacity>
+                    <View style={{ padding: 10, backgroundColor: 'gray', }}>
+                        <Text style={{ color: 'white' }}>SIGNUP</Text>
+                    </View>
+                    // </TouchableOpacity>
+                    :
+
+                    <TouchableOpacity onPress={this.handleSignUp.bind(this)}>
+                        <View style={{ padding: 10, backgroundColor: '#3173FA', }}>
+                            <Text style={{ color: 'white' }}>SIGNUP</Text>
+                        </View>
+                    </TouchableOpacity>
+                }
+                {/* {this.props.loading ? <ActivityIndicator color="blue" /> : <Button title="Sign Up" onPress={this.handleSignUp.bind(this)} />} */}
                 <View style={{ marginBottom: 20 }}></View>
                 <Button
                     title="Already have an account? Login"
@@ -119,5 +215,16 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginTop: 8,
         padding: 10,
-    }
+    },
+    avatarContainer: {
+        borderColor: '#9B9B9B',
+        borderWidth: 1 / PixelRatio.get(),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatar: {
+        borderRadius: 75,
+        width: 150,
+        height: 150,
+    },
 })
