@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/FontAwesome5';
 import { GiftedChat } from "react-native-gifted-chat";
 import firebase from "react-native-firebase";
 
-var name, uid, email;
+var name, uid, email, image;
 
 class ChatScreen extends Component {
     constructor(props) {
@@ -17,6 +17,7 @@ class ChatScreen extends Component {
         uid = params.uid;
         name = params.name;
         email = params.email;
+        image = params.image;
 
         this.chatRef = this.getRef().child("chat/" + this.generateChatId());
         this.chatRefData = this.chatRef.orderByChild("order");
@@ -41,10 +42,13 @@ class ChatScreen extends Component {
                     text: child.val().text,
                     createdAt: new Date(child.val().createdAt),
                     user: {
-                        _id: child.val().uid
-                        //avatar: avatar
+                        _id: child.val().uid,
+                        avatar: child.val().image,
+                        sent: true,
+                        received: true
                     }
                 });
+                console.log("images", child.val())
             });
 
             this.setState({
@@ -66,7 +70,10 @@ class ChatScreen extends Component {
                 createdAt: now,
                 uid: this.user.uid,
                 fuid: uid,
-                order: -1 * now
+                order: -1 * now,
+                user: {
+                    avatar: image
+                }
             });
         });
     }
@@ -96,6 +103,7 @@ class ChatScreen extends Component {
                 </View>
                 <View style={styles.container}>
                     <GiftedChat
+                        showUserAvatar={true}
                         messages={this.state.messages}
                         onSend={this.onSend.bind(this)}
                         user={{
