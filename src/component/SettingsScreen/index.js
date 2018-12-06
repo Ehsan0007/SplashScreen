@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, ListView, StyleSheet, Image,FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, ListView, StyleSheet, Image, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from "react-native-firebase";
 import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail } from 'native-base';
 
-var name, uid, email;
+var name, uid, email, avatar;
 
 class SettingsScreen extends Component {
     constructor(props) {
@@ -34,7 +34,7 @@ class SettingsScreen extends Component {
                         name: child.val().name,
                         uid: child.val().uid,
                         email: child.val().email,
-                        image : child.val().image
+                        image: child.val().image
                     });
             });
 
@@ -57,13 +57,16 @@ class SettingsScreen extends Component {
                     name = rowData.name;
                     email = rowData.email;
                     uid = rowData.uid;
+                    // avatar: rowData.image
                     this.props.navigation.navigate("Chat", {
                         name: name,
                         email: email,
                         uid: uid,
+                        image: rowData.image
                     });
                 }}
             >
+            {/* {console.log("send",)} */}
                 <View style={{ width: '100%', height: 70, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderBottomColor: "#ccc", borderTopColor: "transparent", borderRightColor: "transparent", borderLeftColor: "transparent" }}>
                     <View style={{ width: '90%', alignSelf: "center", flexDirection: 'row', justifyContent: "space-between" }}>
                         <View style={{ width: '25%', justifyContent: 'center' }}>

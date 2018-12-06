@@ -18,7 +18,7 @@ class ChatScreen extends Component {
         name = params.name;
         email = params.email;
         image = params.image;
-
+        console.log("recieve", image)
         this.chatRef = this.getRef().child("chat/" + this.generateChatId());
         this.chatRefData = this.chatRef.orderByChild("order");
         this.onSend = this.onSend.bind(this);
@@ -88,6 +88,7 @@ class ChatScreen extends Component {
     }
 
     render() {
+        // console.log("lalala",image)
         return (
             <View style={{ flex: 1, }}>
                 <View style={{ flex: 0.5, width: '100%', backgroundColor: '#3173FA', justifyContent: 'center', }}>
@@ -106,9 +107,18 @@ class ChatScreen extends Component {
                         showUserAvatar={true}
                         messages={this.state.messages}
                         onSend={this.onSend.bind(this)}
+                        showAvatarForEveryMessage
                         user={{
-                            _id: this.user.uid
+                            _id: this.user.uid,
+                            avatar: image
                         }}
+                        parsePatterns={linkStyle => [
+                            {
+                                pattern: /#(\w+)/,
+                                style: { ...linkStyle, color: 'lightgreen' },
+                                onPress: props => alert(`press on ${props}`),
+                            },
+                        ]}
                     />
                 </View>
             </View>
